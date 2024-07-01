@@ -1,2 +1,2 @@
 # maze-gen-and-solve
-Maze Generator and Solver
+Maze Generator and Solver Project
