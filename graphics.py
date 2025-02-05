@@ -49,26 +49,21 @@ class Line:
 class Cell:
 
     def __init__(self, window, point1, point2, left=True, right=True, top=True, bottom=True):
-        self._has_left_wall = left
-        self._has_right_wall = right
-        self._has_top_wall = top
-        self._has_bottom_wall = bottom
-        self._x1 = point1.x
-        self._x2 = point1.y
-        self._y1 = point2.x
-        self._y2 = point2.y
+        left_line = Line(Point(point1.x, point1.y), Point(point1.x, point2.y))
+        right_line = Line(Point(point2.x, point1.y), Point(point2.x, point2.y))
+        top_line = Line(Point(point1.x, point1.y), Point(point2.x, point1.y))
+        bottom_line = Line(Point(point1.x, point2.y), Point(point2.x, point2.y))
+        self._box_map = [
+            [left, right, top, bottom], 
+            [left_line, right_line, top_line, bottom_line]
+        ]
+        self.point1 = point1
+        self.point2 = point2
         self._win = window
 
     def draw(self):
-        if self._has_left_wall:
-            left_line = Line(Point(self._x1, self._y1), Point(self._x1, self._y2))
-            self._win.draw_line(left_line)
-        if self._has_right_wall:
-            right_line = Line(Point(self._x2, self._y1), Point(self._x2, self._y2))
-            self._win.draw_line(right_line)
-        if self._has_top_wall:
-            top_line = Line(Point(self._x1, self._y1), Point(self._x2, self._y1))
-            self._win.draw_line(top_line)
-        if self._has_bottom_wall:
-            bottom_line = Line(Point(self._x1, self._y2), Point(self._x2, self._y2))
-            self._win.draw_line(bottom_line)
+        count = 0
+        for wall in self._box_map[0]:
+            if wall:
+                self._win.draw_line(self._box_map[1][count])
+            count += 1
