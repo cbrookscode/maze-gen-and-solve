@@ -9,6 +9,8 @@ class Window:
         self.__canvas.pack()
         self.__isrunning = False
         self.__root.protocol("WM_DELETE_WINDOW", self.close)
+        self.width = width
+        self.height = height
 
 
     def redraw(self):
@@ -48,22 +50,42 @@ class Line:
 
 class Cell:
 
-    def __init__(self, window, point1, point2, left=True, right=True, top=True, bottom=True):
+    def __init__(self, window, left=True, right=True, top=True, bottom=True):
+        self._box_map = [left, right, top, bottom]
+        self._win = window
+        self.x1 = None
+        self.y1 = None
+        self.x2 = None
+        self.y2 = None
+
+    # draw cell
+    def draw(self, point1, point2):
         left_line = Line(Point(point1.x, point1.y), Point(point1.x, point2.y))
         right_line = Line(Point(point2.x, point1.y), Point(point2.x, point2.y))
         top_line = Line(Point(point1.x, point1.y), Point(point2.x, point1.y))
         bottom_line = Line(Point(point1.x, point2.y), Point(point2.x, point2.y))
-        self._box_map = [
-            [left, right, top, bottom], 
-            [left_line, right_line, top_line, bottom_line]
-        ]
-        self.point1 = point1
-        self.point2 = point2
-        self._win = window
 
-    def draw(self):
+        self.x1 = point1.x
+        self.y1 = point1.y
+        self.x2 = point2.x
+        self.y2 = point2.y
+
+        tracker = [left_line, right_line, top_line, bottom_line]
         count = 0
-        for wall in self._box_map[0]:
+        for wall in self._box_map:
             if wall:
-                self._win.draw_line(self._box_map[1][count])
+                self._win.draw_line(tracker[count])
             count += 1
+
+    # draw line between center point of two cells
+    def draw_move(self, to_cell, undo=False):
+        cell1_center_x = (self.x1 + self.x2) / 2
+        cell2_center_x = (to_cell.x1 + to_cell.x2) / 2
+        cell1_center_y = (self.y1 + self.y2) / 2
+        cell2_center_y = (to_cell.y1 + to_cell.y2) / 2
+        
+        centering_line = Line(Point(cell1_center_x, cell1_center_y), Point(cell2_center_x, cell2_center_y))
+        if undo:
+            self._win.draw_line(centering_line, "gray")
+        else:
+            self._win.draw_line(centering_line, "red")
