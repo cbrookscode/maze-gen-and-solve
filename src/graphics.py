@@ -50,13 +50,18 @@ class Line:
 
 class Cell:
 
-    def __init__(self, window, left=True, right=True, top=True, bottom=True):
-        self._box_map = [left, right, top, bottom]
+    def __init__(self, window):
+        self.has_left_wall = True
+        self.has_right_wall = True
+        self.has_top_wall = True
+        self.has_bottom_wall = True
+        self.walls = [self.has_left_wall, self.has_right_wall, self.has_top_wall, self.has_bottom_wall]
         self._win = window
         self.x1 = None
         self.y1 = None
         self.x2 = None
         self.y2 = None
+        self.visited = False
 
     # draw cell
     def draw(self, point1, point2):
@@ -65,17 +70,19 @@ class Cell:
         top_line = Line(Point(point1.x, point1.y), Point(point2.x, point1.y))
         bottom_line = Line(Point(point1.x, point2.y), Point(point2.x, point2.y))
 
+        lines = [(left_line, self.has_left_wall), (right_line, self.has_right_wall), (top_line, self.has_top_wall), (bottom_line, self.has_bottom_wall)]
+
         self.x1 = point1.x
         self.y1 = point1.y
         self.x2 = point2.x
         self.y2 = point2.y
 
-        tracker = [left_line, right_line, top_line, bottom_line]
-        count = 0
-        for wall in self._box_map:
-            if wall:
-                self._win.draw_line(tracker[count])
-            count += 1
+        for line, has_wall in lines:
+            if has_wall:
+                self._win.draw_line(line)
+            else:
+                self._win.draw_line(line, fill_color="white")
+
 
     # draw line between center point of two cells
     def draw_move(self, to_cell, undo=False):
@@ -89,3 +96,9 @@ class Cell:
             self._win.draw_line(centering_line, "gray")
         else:
             self._win.draw_line(centering_line, "red")
+    
+    def is_valid_cell(self, i, j):
+        return (i >= 0 and 
+                i < len(self.cells) and 
+                j >= 0 and 
+                j < len(self.cells[0]))
