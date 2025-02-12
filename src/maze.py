@@ -43,6 +43,7 @@ class Maze:
             y = self.y1
         self._break_entrance_and_exit()
         self._break_walls_r(0, 0)
+        self._reset_cells_visited()
 
 
     def _animate(self):
@@ -112,3 +113,10 @@ class Maze:
                 if new_i == i - 1 and new_j == j:
                     current_cell.has_left_wall = False
                     self._break_walls_r(new_i, new_j)
+
+
+    def _reset_cells_visited(self):
+        for row in self._cells:
+            for cell in row:
+                cell.visited = False
+        return
