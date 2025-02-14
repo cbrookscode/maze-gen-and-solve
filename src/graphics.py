@@ -1,4 +1,4 @@
-from tkinter import Tk, BOTH, Canvas
+from tkinter import *
 
 class Window:
 
@@ -6,9 +6,9 @@ class Window:
         self.__root = Tk()
         self.__root.title("Root Widget Title Placeholder")
         self.__canvas = Canvas(self.__root, background="white")
-        self.__canvas.pack()
+        self.__canvas.pack(fill="both", expand=True)
         self.__isrunning = False
-        self.__root.protocol("WM_DELETE_WINDOW", self.close)
+        self.__root.protocol("WM_DELETE_WINDOW", self.__root.destroy)
         self.width = width
         self.height = height
 
@@ -93,12 +93,13 @@ class Cell:
         
         centering_line = Line(Point(cell1_center_x, cell1_center_y), Point(cell2_center_x, cell2_center_y))
         if undo:
-            self._win.draw_line(centering_line, "gray")
+            self._win.draw_line(centering_line, "white")
         else:
             self._win.draw_line(centering_line, "red")
-    
-    def is_valid_cell(self, i, j):
-        return (i >= 0 and 
-                i < len(self.cells) and 
-                j >= 0 and 
-                j < len(self.cells[0]))
+
+
+    def is_same_cell(self, other):
+        if self.x1 == other.x1 and self.x2 == other.x2 and self.y1 == other.y1 and self.y2 == other.y2:
+            return True
+        else:
+            return False

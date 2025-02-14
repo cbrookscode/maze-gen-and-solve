@@ -103,15 +103,19 @@ class Maze:
                 new_j = not_visited[random_index][1]
                 if new_i == i and new_j == j + 1:
                     current_cell.has_bottom_wall = False
+                    self._cells[new_i][new_j].has_top_wall = False
                     self._break_walls_r(new_i, new_j)
                 if new_i == i and new_j == j - 1:
                     current_cell.has_top_wall = False
+                    self._cells[new_i][new_j].has_bottom_wall = False
                     self._break_walls_r(new_i, new_j)
                 if new_i == i + 1 and new_j == j:
                     current_cell.has_right_wall = False
+                    self._cells[new_i][new_j].has_left_wall = False
                     self._break_walls_r(new_i, new_j)
                 if new_i == i - 1 and new_j == j:
                     current_cell.has_left_wall = False
+                    self._cells[new_i][new_j].has_right_wall = False
                     self._break_walls_r(new_i, new_j)
 
 
@@ -120,3 +124,42 @@ class Maze:
             for cell in row:
                 cell.visited = False
         return
+
+
+    def _solve_r(self, i ,j):
+        self._animate()
+
+        current_cell = self._cells[i][j]
+        current_cell.visited = True
+
+        goal = self._cells[-1][-1]
+
+        left = (i - 1, j)
+        right = (i + 1 , j)
+        top = (i, j - 1)
+        bottom = (i, j + 1)
+        directions = [left, right, top, bottom]
+
+        if current_cell.is_same_cell(goal):
+            return True
+        
+        counter = 0
+        for direction in directions:
+            compass = ["left", "right", "top", "bottom"]
+            attribute_name = f"has_{compass[counter]}_wall"
+            counter += 1
+            # If there is a cell in that direction, there is no wall blocking you from that cell, and that cell hasn't been visited
+            if self.is_valid_cell(direction) == True and getattr(self._cells[i][j], attribute_name) == False and self._cells[direction[0]][direction[1]].visited == False:
+                current_cell.draw_move(self._cells[direction[0]][direction[1]])
+                if self._solve_r(direction[0], direction[1]):
+                    return True
+                else:
+                    current_cell.draw_move(self._cells[direction[0]][direction[1]], undo=True)
+        return False
+
+
+    def solve(self):
+        if self._solve_r(0, 0):
+            return True
+        else:
+            return False
